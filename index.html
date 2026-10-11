@@ -71,7 +71,7 @@ th{background:#fafafa;color:#666;font-weight:600}
 
 <div class="card">
 <h2>🎯 10月目标完成情况 <span style="font-size:12px;color:#999;font-weight:400">三平台实收合计</span></h2>
-<div class="sub">📐 公式：预估完成率 = (1-8日实收 ÷ 8天 × 31天) ÷ 月目标 ｜ 只考核负责人大盘</div>
+<div class="sub">📐 公式：预估完成率 = (1-10日实收 ÷ 10天 × 31天) ÷ 月目标 ｜ 只考核负责人大盘</div>
 <div id="targetBars"></div>
 </div>
 
@@ -129,6 +129,7 @@ var charts = {};
 function shortName(s){ return s.replace("同庆楼",""); }
 function pct(x,d){ return (x*100).toFixed(d===undefined?2:d)+"%"; }
 function initChart(id){
+  if(typeof echarts==="undefined") return null; /* CDN 加载失败时跳过图表，表格照常渲染 */
   if(charts[id]) charts[id].dispose();
   charts[id] = echarts.init(document.getElementById(id));
   return charts[id];
@@ -168,24 +169,24 @@ function applyFilter(){
   var fAvg = (function(){var q=DATA.foodsafe.filter(f);return q.length?q.reduce(function(a,r){return a+r.食品安全负反馈率;},0)/q.length:0;})();
 
   document.getElementById("kpis").innerHTML = [
-    ["📅","本月实收","¥1681211","10-01~10-08 · 三平台"],
-    ["📊","本月订单","48788单","10-01~10-08 · 三平台"],
+    ["📅","本月实收","¥2098801","10-01~10-10 · 三平台"],
+    ["📊","本月订单","62239单","10-01~10-10 · 三平台"],
     ["💰","昨日实收","¥"+Math.round(income),"美团+淘闪+京东"],
     ["📦","昨日订单",fmtInt(orders)+"单","美团+淘闪+京东"],
-    ["💵","昨日到手率","57.89%","美团+淘闪+京东 · 10-08"],
-    ["🏷️","昨日折扣率","25.81%","美团+淘闪+京东 · 10-08"],
-    ["⭐","差评率",pct(diffRate),"美团+淘闪 · 10-01~10-08"],
-    ["🍽️","菜品质量",qAvg.toFixed(2)+"分","美团 · 10-01~10-08"],
-    ["🛡️","食安负反馈",fAvg.toFixed(1)+"%","美团 · 10-01~10-08"]
+    ["💵","昨日到手率","57.75%","美团+淘闪+京东 · 10-10"],
+    ["🏷️","昨日折扣率","25.75%","美团+淘闪+京东 · 10-10"],
+    ["⭐","差评率",pct(diffRate),"美团+淘闪 · 10-01~10-10"],
+    ["🍽️","菜品质量",qAvg.toFixed(2)+"分","美团 · 10-01~10-10"],
+    ["🛡️","食安负反馈",fAvg.toFixed(1)+"%","美团 · 10-01~10-10"]
   ].map(function(k){
     return '<div class="kpi"><div class="icon">'+k[0]+'</div><div class="label">'+k[1]+'</div><div class="val">'+k[2]+'</div><div class="hint">'+k[3]+'</div></div>';
   }).join("");
 
   /* 目标 */
   var targets = [
-    {name:"董康", goal:2973819, actual:623937, rate:0.813},
-    {name:"伍宇星", goal:3699180, actual:735924, rate:0.771},
-    {name:"陈宝林", goal:2143107, actual:321350, rate:0.581}
+    {name:"董康", goal:2973818, actual:766706, rate:0.799},
+    {name:"伍宇星", goal:3699182, actual:914744, rate:0.767},
+    {name:"陈宝林", goal:2143108, actual:417351, rate:0.604}
   ];
   document.getElementById("targetBars").innerHTML = targets.map(function(t){
     var c = t.rate>=0.9?"#52c41a":t.rate>=0.7?"#faad14":"#f5222d";
@@ -198,7 +199,7 @@ function applyFilter(){
   var rs = rs0.slice().sort(function(a,b){return a.差评率-b.差评率;});
   var c1 = initChart("chartReview");
   var top10 = rs.slice().sort(function(a,b){return b.差评率-a.差评率;}).slice(0,10);
-  c1.setOption({
+  if(c1)c1.setOption({
     tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>差评率 "+p[0].value+"%";}},
     xAxis:{type:"category",data:top10.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
     yAxis:{type:"value",axisLabel:{formatter:"{value}%"}},
@@ -217,7 +218,7 @@ function applyFilter(){
   document.getElementById("qualitySummary").textContent = "共"+qs.length+"家 ｜ 平均 "+(qs.reduce(function(a,r){return a+r.商品质量分;},0)/qs.length).toFixed(2)+" 分";
   var c2 = initChart("chartQuality");
   var qBot = qs.slice().sort(function(a,b){return a.商品质量分-b.商品质量分;}).slice(0,12);
-  c2.setOption({
+  if(c2)c2.setOption({
     tooltip:{trigger:"axis"},
     xAxis:{type:"category",data:qBot.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
     yAxis:{type:"value",min:3.5,max:5},
@@ -236,7 +237,7 @@ function applyFilter(){
   document.getElementById("foodSummary").textContent = "共"+fs.length+"家 ｜ 平均 "+(fs.reduce(function(a,r){return a+r.食品安全负反馈率;},0)/fs.length).toFixed(1)+"%";
   var c3 = initChart("chartFood");
   var fTop = fs.slice().sort(function(a,b){return b.食品安全负反馈率-a.食品安全负反馈率;}).slice(0,12);
-  c3.setOption({
+  if(c3)c3.setOption({
     tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>"+p[0].value+"%";}},
     xAxis:{type:"category",data:fTop.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
     yAxis:{type:"value",axisLabel:{formatter:"{value}%"}},
@@ -254,7 +255,7 @@ function applyFilter(){
   var ss = stores.slice().sort(function(a,b){return b.收入-a.收入;});
   var c4 = initChart("chartStore");
   var top12 = ss.slice(0,12);
-  c4.setOption({
+  if(c4)c4.setOption({
     tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>¥"+Number(p[0].value);}},
     xAxis:{type:"category",data:top12.map(function(s){return shortName(s.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
     yAxis:{type:"value",axisLabel:{formatter:function(v){return v>=1000?(v/1000)+"k":v;}}},
@@ -270,7 +271,7 @@ function applyFilter(){
 
 /* 差评分析：按门店展开 */
   var bc = DATA.badAnalysis.cats;
-  charts.badCat = echarts.init(document.getElementById("chartBadCat"));
+  if(typeof echarts!=="undefined"){charts.badCat = echarts.init(document.getElementById("chartBadCat"));
   charts.badCat.setOption({
     title:{text:"差评问题类型分布",left:"center",textStyle:{fontSize:13}},
     tooltip:{trigger:"axis",axisPointer:{type:"shadow"}},
@@ -278,7 +279,7 @@ function applyFilter(){
     yAxis:{type:"category",data:bc.map(function(x){return x.type;}).reverse(),axisLabel:{fontSize:11}},
     series:[{type:"bar",data:bc.map(function(x){return x.count;}).reverse(),
       itemStyle:{color:"#f5222d"},label:{show:true,position:"right"}}]
-  });
+  });}
   var bd = DATA.badAnalysis.details.filter(f);
   document.getElementById("badStoreList").innerHTML = bd.map(function(x){
     var probs = x.problems.map(function(p){
