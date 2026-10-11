@@ -267,7 +267,6 @@ function applyFilter(){
     var rc = i<3?"rank-"+(i+1):"";
     return "<tr><td><span class='rank "+rc+"'>"+(i+1)+"</span></td><td>"+shortName(s.店)+"</td><td><b>¥"+Math.round(s.收入)+"</b></td><td>"+fmtInt(s.订单)+"</td><td>"+(s.到手率*100).toFixed(1)+"%</td><td>"+gradeBadge(gradeStore(s.到手率))+"</td></tr>";
   }).join("");
-}
 
 /* 差评分析：按门店展开 */
   var bc = DATA.badAnalysis.cats;
@@ -291,6 +290,7 @@ function applyFilter(){
       +" <span style='color:#c53030'>"+x.差评数+"条差评</span></summary>"
       +"<div style='margin-top:8px'>"+probs+"</div></details>";
   }).join("") || "<div style='text-align:center;color:#999'>本月暂无差评</div>";
+}
 
 window.addEventListener("resize", function(){ for(var k in charts){ charts[k].resize(); } });
 applyFilter();
