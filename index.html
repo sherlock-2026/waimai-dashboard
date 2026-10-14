@@ -129,8 +129,15 @@ var charts = {};
 function shortName(s){ return s.replace("同庆楼",""); }
 function pct(x,d){ return (x*100).toFixed(d===undefined?2:d)+"%"; }
 function initChart(id){
+  if(typeof echarts === "undefined"){
+    return { setOption: function(){}, dispose: function(){} };
+  }
   if(charts[id]) charts[id].dispose();
-  charts[id] = echarts.init(document.getElementById(id));
+  try {
+    charts[id] = echarts.init(document.getElementById(id));
+  } catch(e) {
+    charts[id] = { setOption: function(){}, dispose: function(){} };
+  }
   return charts[id];
 }
 function barColor(v, bad, warn){
@@ -271,7 +278,12 @@ function applyFilter(){
 
 /* 差评分析：按门店展开 */
   var bc = DATA.badAnalysis.cats;
-  charts.badCat = echarts.init(document.getElementById("chartBadCat"));
+  if(typeof echarts !== "undefined"){
+    try { charts.badCat = echarts.init(document.getElementById("chartBadCat")); }
+    catch(e) { charts.badCat = { setOption: function(){} }; }
+  } else {
+    charts.badCat = { setOption: function(){} };
+  }
   charts.badCat.setOption({
     title:{text:"差评问题类型分布",left:"center",textStyle:{fontSize:13}},
     tooltip:{trigger:"axis",axisPointer:{type:"shadow"}},
@@ -292,7 +304,7 @@ function applyFilter(){
       +"<div style='margin-top:8px'>"+probs+"</div></details>";
   }).join("") || "<div style='text-align:center;color:#999'>本月暂无差评</div>";
 
-window.addEventListener("resize", function(){ for(var k in charts){ charts[k].resize(); } });
+window.addEventListener("resize", function(){ for(var k in charts){ try{ if(charts[k].resize) charts[k].resize(); }catch(e){} } });
 applyFilter();
 </script>
 </div></body></html>
