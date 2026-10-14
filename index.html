@@ -1,310 +1,1185 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>同庆楼外卖经营看板</title>
-<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  background:#f0f2f5;color:#1f2329;font-size:14px;min-height:100vh}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 14px 48px}
-.header{background:linear-gradient(135deg,#c0392b 0%,#e74c3c 100%);border-radius:16px;padding:26px 28px;margin-bottom:16px;color:#fff;box-shadow:0 4px 16px rgba(192,57,43,.25)}
-.header h1{font-size:24px;font-weight:700}
-.header p{opacity:.8;font-size:12px;margin-top:6px}
-.filter{background:#fff;border-radius:12px;padding:12px 18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.filter select{font-size:14px;padding:8px 14px;border-radius:8px;border:2px solid #e2e8f0;cursor:pointer}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f4f5f7;color:#1f2329;font-size:14px}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;padding:24px;margin-bottom:16px}
+.header h1{font-size:22px;margin-bottom:8px}
+.header .sub{font-size:13px;opacity:.9}
+.card{background:#fff;border-radius:10px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h2{font-size:16px;margin-bottom:12px}
+.card .formula{font-size:12px;color:#999;margin-bottom:12px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center}
-.kpi .icon{font-size:26px}
-.kpi .label{font-size:12px;color:#888;margin:6px 0 4px}
-.kpi .val{font-size:24px;font-weight:800}
+.kpi{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.kpi .label{font-size:12px;color:#888;margin-bottom:6px}
+.kpi .val{font-size:24px;font-weight:700}
 .kpi .hint{font-size:11px;color:#aaa;margin-top:4px}
-.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.card h2{font-size:17px;margin-bottom:6px}
-.card .sub{font-size:12px;color:#999;margin-bottom:10px}
-.chart{width:100%;height:340px;margin:6px 0}
-.target{margin:12px 0}
-.target .t-head{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
-.target .t-name{font-weight:700}
-.target .bar{height:14px;background:#f0f0f0;border-radius:7px;overflow:hidden}
-.target .bar>div{height:100%;border-radius:7px}
-.target .t-foot{font-size:12px;color:#888;margin-top:4px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:9px 6px;text-align:right;border-bottom:1px solid #f0f0f0}
-th:first-child,td:first-child{text-align:left}
-th{background:#fafafa;color:#666;font-weight:600}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
-.dot-r{background:#f5222d}.dot-y{background:#faad14}.dot-g{background:#52c41a}
-.detail{margin-top:8px}
-.rank{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#f0f0f0;font-size:12px;font-weight:700}
-.rank-1{background:#ffd700;color:#fff}.rank-2{background:#c0c0c0;color:#fff}.rank-3{background:#cd7f32;color:#fff}
-.grade{display:inline-block;min-width:44px;height:28px;line-height:28px;text-align:center;border-radius:8px;font-weight:800;font-size:13px;color:#fff;padding:0 8px}
-.grade-A{background:#52c41a}.grade-B{background:#faad14}.grade-C{background:#f5222d}
-.legend{font-size:12px;color:#999;margin-top:8px}
-</style></head><body><div class="wrap">
+th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0}
+th{background:#fafafa;font-weight:600;text-align:left}
+th[style*="right"],td[style*="right"]{text-align:right}
+</style>
+</head>
+<body>
+<div class="wrap">
 
 <div class="header">
 <h1>🏮 同庆楼外卖经营看板</h1>
-<p>数据日期 2026-10-13 ｜ 美团外卖 + 淘宝闪购 + 京东外卖 ｜ 每日更新</p>
+<div class="sub">数据日期 2026-10-13 ｜ 美团外卖 + 淘宝闪购 + 京东外卖 ｜ 每日更新</div>
 </div>
 
-<div class="filter">
-<span>🏙️ 城市：</span>
-<select id="cityFilter" onchange="applyFilter()">
-<option value="">全部</option>
-<option value="合肥">合肥</option>
-<option value="无锡">无锡</option>
-<option value="南京">南京</option>
-<option value="芜湖">芜湖</option>
-<option value="常州">常州</option>
-<option value="安庆">安庆</option>
-<option value="滁州">滁州</option>
-<option value="北京">北京</option>
-<option value="阜阳">阜阳</option>
-<option value="溧阳">溧阳</option>
-<option value="镇江">镇江</option>
-<option value="上海">上海</option>
-<option value="淮北">淮北</option>
-</select>
+<div class="kpis">
+<div class="kpi"><div class="label">昨日实收（三平台）</div><div class="val">¥0</div><div class="hint">美团+淘闪+京东</div></div>
+<div class="kpi"><div class="label">昨日有效订单</div><div class="val">0</div><div class="hint">美团+淘闪+京东</div></div>
+<div class="kpi"><div class="label">近30天差评率</div><div class="val">0.21%</div><div class="hint">美团+淘闪</div></div>
+<div class="kpi"><div class="label">商品质量分（近7日）</div><div class="val">4.42</div><div class="hint">美团</div></div>
+<div class="kpi"><div class="label">食安负反馈率（近7日）</div><div class="val">9.4%</div><div class="hint">美团</div></div>
 </div>
-
-<div class="kpis" id="kpis"></div>
 
 <div class="card">
 <h2>🎯 10月目标完成情况 <span style="font-size:12px;color:#999;font-weight:400">三平台实收合计</span></h2>
-<div class="sub">📐 公式：预估完成率 = (1-8日实收 ÷ 8天 × 31天) ÷ 月目标 ｜ 只考核负责人大盘</div>
-<div id="targetBars"></div>
+<div class="formula">📐 只考核负责人大盘</div>
+<p style="color:#999">暂无目标数据</p>
 </div>
 
 <div class="card">
-<h2>⭐ 差评率 <span style="font-size:12px;color:#999;font-weight:400">美团外卖+淘宝闪购 · 本月10-01~10-08</span></h2>
-<div class="sub">📐 公式：差评率 = 一二星差评数 ÷ 有效订单数（美团+淘闪）<br>美团一二星 = 商品评分&lt;3 ｜ 淘闪一二星 = 总体评分&lt;3 ｜ 评级：A类&lt;0.5%，B类0.5%~1%，C类≥1%</div>
-<div class="chart" id="chartReview"></div>
-<div class="detail"><table>
-<tr><th>门店</th><th>有效订单数</th><th>一二星差评数</th><th>差评率</th><th>回复率</th><th>差评率评级</th></tr>
-<tbody id="reviewTable"></tbody></table>
-<div class="legend">评级标准：A类 差评率&lt;0.5% ｜ B类 0.5%~1% ｜ C类 ≥1%</div></div>
+<h2>⭐ 差评率 <span style="font-size:12px;color:#999;font-weight:400">美团+淘闪 · 近30天</span></h2>
+<div class="formula">📐 差评率 = 差评数 ÷ 有效订单数 ｜ 美团差评=商品评分&lt;3 ｜ 淘闪差评=总体评分&lt;3 ｜ A类&lt;0.5%，B类0.5%~1%，C类≥1%</div>
+<div style="margin-bottom:10px">差评 403 ｜ 有效订单 190,157 ｜ 差评率 0.21%</div>
+<table>
+<tr><th>门店</th><th style="text-align:right">有效订单数</th><th style="text-align:right">差评数</th><th style="text-align:right">差评率</th><th style="text-align:right">回复率</th><th style="text-align:center">评级</th></tr>
+<tr>
+<td>帕丽斯常州常青里店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right"><b>0.00%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯合肥奥莱店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right"><b>0.00%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京建邺万达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"><b>0.08%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京鼓楼店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"><b>0.08%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼溧阳天目路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.09%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯无锡锡沪路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><b>0.09%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥金屯店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.10%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京珠江路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"><b>0.11%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥瑶海富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.11%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼上海富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><b>0.11%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥马鞍山路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.12%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼滁州悦达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.12%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼句容1912店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.12%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆大南门店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼滁州富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州吾悦店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡安镇店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡滨湖万达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼淮北濉溪店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right"><b>0.13%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡惠山万达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.14%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥铜冠富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.15%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼北京大钟寺店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.16%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥花园店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right"><b>0.17%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥北城富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><b>0.17%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥明珠富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.17%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥长丰路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.17%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京新华大厦店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.18%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥徽州府店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.19%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖奥体店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.20%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京国泰店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">9</td>
+<td style="text-align:right"><b>0.20%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥高新富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.20%</b></td>
+<td style="text-align:right">97%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖赭山西路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.21%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡茂业店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">12</td>
+<td style="text-align:right"><b>0.21%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥皖通店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.22%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆人民东路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.22%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥凤阳路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">11</td>
+<td style="text-align:right"><b>0.23%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡宝能店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.23%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥肥西富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><b>0.23%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼阜阳双清湾店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right"><b>0.23%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥之心城店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right"><b>0.24%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼北京金宝街店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.25%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼阜阳富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.25%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥庐州府店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">13</td>
+<td style="text-align:right"><b>0.26%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼肥东吾悦店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right"><b>0.26%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥安高店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right"><b>0.27%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州奥体店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">10</td>
+<td style="text-align:right"><b>0.27%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥天鹅万达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.29%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">12</td>
+<td style="text-align:right"><b>0.29%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京红山路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">9</td>
+<td style="text-align:right"><b>0.29%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡哥伦布店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.29%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥包河万达店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.31%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥百大心悦城店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right"><b>0.31%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡华夏路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">13</td>
+<td style="text-align:right"><b>0.31%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥铜陵路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">9</td>
+<td style="text-align:right"><b>0.33%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖银湖店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">7</td>
+<td style="text-align:right"><b>0.34%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡江溪路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">12</td>
+<td style="text-align:right"><b>0.35%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京尧佳路店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">18</td>
+<td style="text-align:right"><b>0.39%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥港汇店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">16</td>
+<td style="text-align:right"><b>0.40%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州孟河店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">8</td>
+<td style="text-align:right"><b>0.41%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖华强店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">11</td>
+<td style="text-align:right"><b>0.44%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥滨湖富茂店</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right"><b>0.72%</b></td>
+<td style="text-align:right">100%</td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr>
+</table>
 </div>
 
 <div class="card">
-<h2>🍽️ 菜品质量 <span style="font-size:12px;color:#999;font-weight:400">美团外卖 · 本月10-01~10-08</span></h2>
-<div class="sub">📐 公式：近7天美团"商品质量分"的平均值（满分5分）｜ 评级：A类≥4.5，B类4.3~4.5，C类&lt;4.3</div><div class="sub" id="qualitySummary"></div>
-<div class="chart" id="chartQuality" style="height:300px"></div>
-<div class="detail"><table>
-<tr><th>门店</th><th>菜品质量分</th><th>菜品质量评级</th></tr>
-<tbody id="qualityTable"></tbody></table>
-<div class="legend">评级标准：A类 ≥4.5分 ｜ B类 4.3~4.5分 ｜ C类 &lt;4.3分</div></div>
+<h2>🍽️ 菜品质量 <span style="font-size:12px;color:#999;font-weight:400">美团 · 近7日</span></h2>
+<div class="formula">📐 近7天美团"商品质量分"平均值（满分5分）｜ A类≥4.5，B类4.3~4.5，C类&lt;4.3</div>
+<div style="margin-bottom:10px">共61家 ｜ 平均 4.42 分</div>
+<table>
+<tr><th>门店</th><th style="text-align:right">商品质量分</th><th style="text-align:center">评级</th></tr>
+<tr>
+<td>同庆楼肥东吾悦店</td>
+<td style="text-align:right"><b>4.90</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯无锡锡沪路店</td>
+<td style="text-align:right"><b>4.80</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥天鹅万达店</td>
+<td style="text-align:right"><b>4.70</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼溧阳天目路店</td>
+<td style="text-align:right"><b>4.70</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京建邺万达店</td>
+<td style="text-align:right"><b>4.69</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥北城富茂店</td>
+<td style="text-align:right"><b>4.69</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥高新富茂店</td>
+<td style="text-align:right"><b>4.60</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯常州常青里店</td>
+<td style="text-align:right"><b>4.60</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡茂业店</td>
+<td style="text-align:right"><b>4.59</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼上海富茂店</td>
+<td style="text-align:right"><b>4.57</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京新华大厦店</td>
+<td style="text-align:right"><b>4.56</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼滁州悦达店</td>
+<td style="text-align:right"><b>4.54</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥瑶海富茂店</td>
+<td style="text-align:right"><b>4.51</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆大南门店</td>
+<td style="text-align:right"><b>4.51</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京鼓楼店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥明珠富茂店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥铜冠富茂店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州奥体店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡滨湖万达店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖华强店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯合肥奥莱店</td>
+<td style="text-align:right"><b>4.50</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼北京金宝街店</td>
+<td style="text-align:right"><b>4.49</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥百大心悦城店</td>
+<td style="text-align:right"><b>4.47</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼淮北濉溪店</td>
+<td style="text-align:right"><b>4.47</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼南京珠江路店</td>
+<td style="text-align:right"><b>4.46</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥铜陵路店</td>
+<td style="text-align:right"><b>4.46</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥之心城店</td>
+<td style="text-align:right"><b>4.43</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼南京尧佳路店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥凤阳路店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥马鞍山路店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼安庆富茂店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼常州吾悦店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼阜阳富茂店</td>
+<td style="text-align:right"><b>4.41</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥庐州府店</td>
+<td style="text-align:right"><b>4.40</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡华夏路店</td>
+<td style="text-align:right"><b>4.40</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡惠山万达店</td>
+<td style="text-align:right"><b>4.40</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼阜阳双清湾店</td>
+<td style="text-align:right"><b>4.40</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥港汇店</td>
+<td style="text-align:right"><b>4.39</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥徽州府店</td>
+<td style="text-align:right"><b>4.37</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼滁州富茂店</td>
+<td style="text-align:right"><b>4.37</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥安高店</td>
+<td style="text-align:right"><b>4.36</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥金屯店</td>
+<td style="text-align:right"><b>4.34</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡安镇店</td>
+<td style="text-align:right"><b>4.34</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼芜湖银湖店</td>
+<td style="text-align:right"><b>4.34</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼北京大钟寺店</td>
+<td style="text-align:right"><b>4.33</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼南京红山路店</td>
+<td style="text-align:right"><b>4.33</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥滨湖富茂店</td>
+<td style="text-align:right"><b>4.30</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥长丰路店</td>
+<td style="text-align:right"><b>4.30</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡哥伦布店</td>
+<td style="text-align:right"><b>4.30</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥肥西富茂店</td>
+<td style="text-align:right"><b>4.29</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥花园店</td>
+<td style="text-align:right"><b>4.29</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼无锡宝能店</td>
+<td style="text-align:right"><b>4.29</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼芜湖奥体店</td>
+<td style="text-align:right"><b>4.26</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥皖通店</td>
+<td style="text-align:right"><b>4.24</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼芜湖赭山西路店</td>
+<td style="text-align:right"><b>4.24</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥包河万达店</td>
+<td style="text-align:right"><b>4.21</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼安庆人民东路店</td>
+<td style="text-align:right"><b>4.21</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼句容1912店</td>
+<td style="text-align:right"><b>4.17</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼南京国泰店</td>
+<td style="text-align:right"><b>4.11</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼常州孟河店</td>
+<td style="text-align:right"><b>4.10</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼无锡江溪路店</td>
+<td style="text-align:right"><b>4.00</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr>
+</table>
 </div>
 
 <div class="card">
-<h2>🛡️ 食品安全 <span style="font-size:12px;color:#999;font-weight:400">美团外卖 · 本月10-01~10-08</span></h2>
-<div class="sub">📐 公式：近7天美团"食品安全负反馈率"的平均值 ｜ 评级：A类≤10%，B类10%~15%，C类&gt;15%</div><div class="sub" id="foodSummary"></div>
-<div class="chart" id="chartFood" style="height:300px"></div>
-<div class="detail"><table>
-<tr><th>门店</th><th>负反馈率</th><th>食安评级</th></tr>
-<tbody id="foodTable"></tbody></table>
-<div class="legend">评级标准：A类 ≤10% ｜ B类 10%~15% ｜ C类 &gt;15%</div></div>
+<h2>🛡️ 食品安全 <span style="font-size:12px;color:#999;font-weight:400">美团 · 近7日</span></h2>
+<div class="formula">📐 近7天美团"食品安全负反馈率"平均值 ｜ A类≤10%，B类10%~15%，C类&gt;15%</div>
+<div style="margin-bottom:10px">共61家 ｜ 平均 9.4%</div>
+<table>
+<tr><th>门店</th><th style="text-align:right">负反馈率</th><th style="text-align:center">评级</th></tr>
+<tr>
+<td>同庆楼上海富茂店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼北京金宝街店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京新华大厦店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼句容1912店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥北城富茂店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥天鹅万达店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆大南门店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼淮北濉溪店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼溧阳天目路店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼滁州悦达店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼肥东吾悦店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼阜阳双清湾店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯合肥奥莱店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯常州常青里店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>帕丽斯无锡锡沪路店</td>
+<td style="text-align:right"><b>0.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州吾悦店</td>
+<td style="text-align:right"><b>1.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京珠江路店</td>
+<td style="text-align:right"><b>1.9%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼常州奥体店</td>
+<td style="text-align:right"><b>3.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京建邺万达店</td>
+<td style="text-align:right"><b>3.3%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡茂业店</td>
+<td style="text-align:right"><b>3.4%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥铜冠富茂店</td>
+<td style="text-align:right"><b>3.6%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡滨湖万达店</td>
+<td style="text-align:right"><b>4.5%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼芜湖华强店</td>
+<td style="text-align:right"><b>6.3%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥之心城店</td>
+<td style="text-align:right"><b>7.3%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥庐州府店</td>
+<td style="text-align:right"><b>7.4%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥高新富茂店</td>
+<td style="text-align:right"><b>7.5%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥滨湖富茂店</td>
+<td style="text-align:right"><b>7.7%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥铜陵路店</td>
+<td style="text-align:right"><b>8.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡哥伦布店</td>
+<td style="text-align:right"><b>8.1%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼南京鼓楼店</td>
+<td style="text-align:right"><b>9.2%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼无锡华夏路店</td>
+<td style="text-align:right"><b>9.4%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼合肥明珠富茂店</td>
+<td style="text-align:right"><b>10.0%</b></td>
+<td style="text-align:center"><span style="background:#52c41a;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">A</span></td>
+</tr><tr>
+<td>同庆楼安庆富茂店</td>
+<td style="text-align:right"><b>10.2%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥马鞍山路店</td>
+<td style="text-align:right"><b>10.4%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥百大心悦城店</td>
+<td style="text-align:right"><b>10.5%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥瑶海富茂店</td>
+<td style="text-align:right"><b>11.4%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼南京尧佳路店</td>
+<td style="text-align:right"><b>11.6%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼北京大钟寺店</td>
+<td style="text-align:right"><b>11.8%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥港汇店</td>
+<td style="text-align:right"><b>11.8%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥徽州府店</td>
+<td style="text-align:right"><b>11.9%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡宝能店</td>
+<td style="text-align:right"><b>11.9%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼滁州富茂店</td>
+<td style="text-align:right"><b>12.3%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥凤阳路店</td>
+<td style="text-align:right"><b>12.5%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼合肥花园店</td>
+<td style="text-align:right"><b>12.6%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼南京红山路店</td>
+<td style="text-align:right"><b>13.1%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼无锡惠山万达店</td>
+<td style="text-align:right"><b>13.6%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼芜湖银湖店</td>
+<td style="text-align:right"><b>14.9%</b></td>
+<td style="text-align:center"><span style="background:#faad14;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">B</span></td>
+</tr><tr>
+<td>同庆楼芜湖赭山西路店</td>
+<td style="text-align:right"><b>15.4%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥肥西富茂店</td>
+<td style="text-align:right"><b>15.6%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥长丰路店</td>
+<td style="text-align:right"><b>16.2%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥安高店</td>
+<td style="text-align:right"><b>16.4%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼安庆人民东路店</td>
+<td style="text-align:right"><b>16.4%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥金屯店</td>
+<td style="text-align:right"><b>17.2%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼无锡安镇店</td>
+<td style="text-align:right"><b>17.3%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼阜阳富茂店</td>
+<td style="text-align:right"><b>17.6%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼芜湖奥体店</td>
+<td style="text-align:right"><b>17.7%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼无锡江溪路店</td>
+<td style="text-align:right"><b>20.3%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥包河万达店</td>
+<td style="text-align:right"><b>23.1%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼南京国泰店</td>
+<td style="text-align:right"><b>25.4%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼合肥皖通店</td>
+<td style="text-align:right"><b>31.3%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr><tr>
+<td>同庆楼常州孟河店</td>
+<td style="text-align:right"><b>44.0%</b></td>
+<td style="text-align:center"><span style="background:#f5222d;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px">C</span></td>
+</tr>
+</table>
 </div>
 
 <div class="card">
-<h2>🔍 差评内容分析 <span style="font-size:12px;color:#999;font-weight:400">本月10-01~10-08 · 美团+淘闪一二星差评</span></h2>
-<div class="sub">📐 点击门店展开看具体差评内容 ｜ 问题类型按差评关键词自动分类</div>
-<div class="chart" id="chartBadCat" style="height:200px"></div>
-<div id="badStoreList"></div>
+<h2>🏪 昨日收入排行 <span style="font-size:12px;color:#999;font-weight:400">美团+淘闪+京东 · 前30名</span></h2>
+<table>
+<tr><th style="text-align:center">#</th><th>门店</th><th style="text-align:right">实收</th><th style="text-align:right">订单</th><th style="text-align:right">到手率</th></tr>
+<tr>
+<td style="text-align:center">1</td>
+<td>同庆楼南京建邺万达店</td>
+<td style="text-align:right">¥8,044</td>
+<td style="text-align:right">230</td>
+<td style="text-align:right">60.0%</td>
+</tr><tr>
+<td style="text-align:center">2</td>
+<td>同庆楼南京鼓楼店</td>
+<td style="text-align:right">¥6,216</td>
+<td style="text-align:right">212</td>
+<td style="text-align:right">57.2%</td>
+</tr><tr>
+<td style="text-align:center">3</td>
+<td>同庆楼南京国泰店</td>
+<td style="text-align:right">¥6,098</td>
+<td style="text-align:right">181</td>
+<td style="text-align:right">59.4%</td>
+</tr><tr>
+<td style="text-align:center">4</td>
+<td>同庆楼无锡茂业店</td>
+<td style="text-align:right">¥5,973</td>
+<td style="text-align:right">185</td>
+<td style="text-align:right">58.8%</td>
+</tr><tr>
+<td style="text-align:center">5</td>
+<td>同庆楼常州吾悦店</td>
+<td style="text-align:right">¥5,968</td>
+<td style="text-align:right">165</td>
+<td style="text-align:right">59.0%</td>
+</tr><tr>
+<td style="text-align:center">6</td>
+<td>同庆楼合肥庐州府店</td>
+<td style="text-align:right">¥5,823</td>
+<td style="text-align:right">194</td>
+<td style="text-align:right">58.1%</td>
+</tr><tr>
+<td style="text-align:center">7</td>
+<td>同庆楼南京新华大厦店</td>
+<td style="text-align:right">¥5,429</td>
+<td style="text-align:right">180</td>
+<td style="text-align:right">59.7%</td>
+</tr><tr>
+<td style="text-align:center">8</td>
+<td>同庆楼北京大钟寺店</td>
+<td style="text-align:right">¥5,098</td>
+<td style="text-align:right">144</td>
+<td style="text-align:right">60.7%</td>
+</tr><tr>
+<td style="text-align:center">9</td>
+<td>同庆楼合肥金屯店</td>
+<td style="text-align:right">¥5,062</td>
+<td style="text-align:right">188</td>
+<td style="text-align:right">56.9%</td>
+</tr><tr>
+<td style="text-align:center">10</td>
+<td>同庆楼无锡安镇店</td>
+<td style="text-align:right">¥4,985</td>
+<td style="text-align:right">156</td>
+<td style="text-align:right">58.7%</td>
+</tr><tr>
+<td style="text-align:center">11</td>
+<td>同庆楼溧阳天目路店</td>
+<td style="text-align:right">¥4,773</td>
+<td style="text-align:right">136</td>
+<td style="text-align:right">57.5%</td>
+</tr><tr>
+<td style="text-align:center">12</td>
+<td>同庆楼无锡滨湖万达店</td>
+<td style="text-align:right">¥4,765</td>
+<td style="text-align:right">137</td>
+<td style="text-align:right">58.7%</td>
+</tr><tr>
+<td style="text-align:center">13</td>
+<td>同庆楼合肥港汇店</td>
+<td style="text-align:right">¥4,605</td>
+<td style="text-align:right">143</td>
+<td style="text-align:right">59.2%</td>
+</tr><tr>
+<td style="text-align:center">14</td>
+<td>同庆楼芜湖赭山西路店</td>
+<td style="text-align:right">¥4,540</td>
+<td style="text-align:right">135</td>
+<td style="text-align:right">59.7%</td>
+</tr><tr>
+<td style="text-align:center">15</td>
+<td>同庆楼南京珠江路店</td>
+<td style="text-align:right">¥4,513</td>
+<td style="text-align:right">140</td>
+<td style="text-align:right">59.0%</td>
+</tr><tr>
+<td style="text-align:center">16</td>
+<td>同庆楼合肥凤阳路店</td>
+<td style="text-align:right">¥4,406</td>
+<td style="text-align:right">164</td>
+<td style="text-align:right">54.9%</td>
+</tr><tr>
+<td style="text-align:center">17</td>
+<td>同庆楼合肥百大心悦城店</td>
+<td style="text-align:right">¥4,355</td>
+<td style="text-align:right">142</td>
+<td style="text-align:right">57.2%</td>
+</tr><tr>
+<td style="text-align:center">18</td>
+<td>同庆楼无锡惠山万达店</td>
+<td style="text-align:right">¥4,336</td>
+<td style="text-align:right">161</td>
+<td style="text-align:right">55.7%</td>
+</tr><tr>
+<td style="text-align:center">19</td>
+<td>同庆楼合肥高新富茂店</td>
+<td style="text-align:right">¥4,228</td>
+<td style="text-align:right">128</td>
+<td style="text-align:right">58.1%</td>
+</tr><tr>
+<td style="text-align:center">20</td>
+<td>同庆楼常州奥体店</td>
+<td style="text-align:right">¥4,010</td>
+<td style="text-align:right">117</td>
+<td style="text-align:right">58.6%</td>
+</tr><tr>
+<td style="text-align:center">21</td>
+<td>同庆楼南京尧佳路店</td>
+<td style="text-align:right">¥3,918</td>
+<td style="text-align:right">124</td>
+<td style="text-align:right">57.6%</td>
+</tr><tr>
+<td style="text-align:center">22</td>
+<td>同庆楼合肥铜冠富茂店</td>
+<td style="text-align:right">¥3,629</td>
+<td style="text-align:right">133</td>
+<td style="text-align:right">55.2%</td>
+</tr><tr>
+<td style="text-align:center">23</td>
+<td>同庆楼合肥瑶海富茂店</td>
+<td style="text-align:right">¥3,592</td>
+<td style="text-align:right">117</td>
+<td style="text-align:right">57.1%</td>
+</tr><tr>
+<td style="text-align:center">24</td>
+<td>同庆楼北京金宝街店</td>
+<td style="text-align:right">¥3,584</td>
+<td style="text-align:right">136</td>
+<td style="text-align:right">55.3%</td>
+</tr><tr>
+<td style="text-align:center">25</td>
+<td>同庆楼芜湖奥体店</td>
+<td style="text-align:right">¥3,488</td>
+<td style="text-align:right">122</td>
+<td style="text-align:right">56.2%</td>
+</tr><tr>
+<td style="text-align:center">26</td>
+<td>同庆楼合肥花园店</td>
+<td style="text-align:right">¥3,426</td>
+<td style="text-align:right">98</td>
+<td style="text-align:right">59.1%</td>
+</tr><tr>
+<td style="text-align:center">27</td>
+<td>同庆楼安庆富茂店</td>
+<td style="text-align:right">¥3,356</td>
+<td style="text-align:right">128</td>
+<td style="text-align:right">54.6%</td>
+</tr><tr>
+<td style="text-align:center">28</td>
+<td>同庆楼合肥明珠富茂店</td>
+<td style="text-align:right">¥3,341</td>
+<td style="text-align:right">120</td>
+<td style="text-align:right">57.0%</td>
+</tr><tr>
+<td style="text-align:center">29</td>
+<td>同庆楼无锡江溪路店</td>
+<td style="text-align:right">¥3,220</td>
+<td style="text-align:right">106</td>
+<td style="text-align:right">56.7%</td>
+</tr><tr>
+<td style="text-align:center">30</td>
+<td>同庆楼无锡华夏路店</td>
+<td style="text-align:right">¥3,188</td>
+<td style="text-align:right">107</td>
+<td style="text-align:right">58.5%</td>
+</tr>
+</table>
 </div>
 
-<div class="card">
-<h2>🏪 昨日收入排行 <span style="font-size:12px;color:#999;font-weight:400">美团+淘闪+京东</span></h2>
-<div class="sub">📐 公式：实收 = 美团营业收入 + 淘闪收入 + 京东收入 ｜ 到手率 = 实收 ÷ 营业额 ｜ 评级按到手率：A类≥60%，B类55%~60%，C类&lt;55%</div>
-<div class="chart" id="chartStore" style="height:400px"></div>
-<div class="detail"><table>
-<tr><th></th><th>门店</th><th>实收</th><th>订单</th><th>到手率</th><th>到手率评级</th></tr>
-<tbody id="storeTable"></tbody></table>
-<div class="legend">评级标准（到手率）：A类 ≥60% ｜ B类 55%~60% ｜ C类 &lt;55%</div></div>
 </div>
-
-</div>
-<script>
-var DATA = {"stores": [{"店": "同庆楼南京建邺万达店", "收入": 8044.0, "订单": 230, "到手率": 0.5995, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼南京鼓楼店", "收入": 6216.2, "订单": 212, "到手率": 0.5724, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼南京国泰店", "收入": 6097.8, "订单": 181, "到手率": 0.5944, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼常州吾悦店", "收入": 5967.6, "订单": 165, "到手率": 0.5896, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼无锡茂业店", "收入": 5973.1, "订单": 185, "到手率": 0.5884, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥庐州府店", "收入": 5823.0, "订单": 194, "到手率": 0.5809, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼南京新华大厦店", "收入": 5428.9, "订单": 180, "到手率": 0.5967, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥金屯店", "收入": 5062.0, "订单": 188, "到手率": 0.5686, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼北京大钟寺店", "收入": 5097.6, "订单": 144, "到手率": 0.6069, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼无锡安镇店", "收入": 4984.8, "订单": 156, "到手率": 0.5871, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼无锡滨湖万达店", "收入": 4765.2, "订单": 137, "到手率": 0.5868, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼溧阳天目路店", "收入": 4773.3, "订单": 136, "到手率": 0.5751, "负责人": "伍宇星", "城市": "溧阳"}, {"店": "同庆楼合肥港汇店", "收入": 4604.9, "订单": 143, "到手率": 0.5923, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼南京珠江路店", "收入": 4513.0, "订单": 140, "到手率": 0.5895, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼芜湖赭山西路店", "收入": 4540.2, "订单": 135, "到手率": 0.5965, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼合肥凤阳路店", "收入": 4406.3, "订单": 164, "到手率": 0.5489, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥百大心悦城店", "收入": 4354.6, "订单": 142, "到手率": 0.5716, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼无锡惠山万达店", "收入": 4335.6, "订单": 161, "到手率": 0.5569, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥高新富茂店", "收入": 4227.6, "订单": 128, "到手率": 0.5811, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼南京尧佳路店", "收入": 3918.3, "订单": 124, "到手率": 0.5764, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼常州奥体店", "收入": 4010.3, "订单": 117, "到手率": 0.5861, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼北京金宝街店", "收入": 3583.7, "订单": 136, "到手率": 0.5526, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼合肥铜冠富茂店", "收入": 3628.8, "订单": 133, "到手率": 0.5516, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼芜湖奥体店", "收入": 3487.9, "订单": 122, "到手率": 0.562, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼合肥瑶海富茂店", "收入": 3592.0, "订单": 117, "到手率": 0.5714, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥花园店", "收入": 3426.2, "订单": 98, "到手率": 0.5909, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼安庆富茂店", "收入": 3355.7, "订单": 128, "到手率": 0.546, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼合肥明珠富茂店", "收入": 3341.0, "订单": 120, "到手率": 0.5698, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡江溪路店", "收入": 3220.4, "订单": 106, "到手率": 0.567, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼无锡华夏路店", "收入": 3188.5, "订单": 107, "到手率": 0.5845, "负责人": "陈宝林", "城市": "无锡"}, {"店": "同庆楼合肥皖通店", "收入": 2952.4, "订单": 98, "到手率": 0.5724, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥马鞍山路店", "收入": 3028.1, "订单": 92, "到手率": 0.5943, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥北城富茂店", "收入": 3107.9, "订单": 82, "到手率": 0.7141, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥天鹅万达店", "收入": 2761.0, "订单": 90, "到手率": 0.5795, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥长丰路店", "收入": 2681.0, "订单": 77, "到手率": 0.59, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡哥伦布店", "收入": 2575.9, "订单": 98, "到手率": 0.5604, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼南京红山路店", "收入": 2468.1, "订单": 89, "到手率": 0.563, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼芜湖华强店", "收入": 2441.4, "订单": 81, "到手率": 0.5802, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼无锡宝能店", "收入": 2369.9, "订单": 83, "到手率": 0.5691, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥安高店", "收入": 2397.2, "订单": 87, "到手率": 0.5725, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥滨湖富茂店", "收入": 2266.4, "订单": 73, "到手率": 0.5829, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥铜陵路店", "收入": 2153.8, "订单": 81, "到手率": 0.5661, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼芜湖银湖店", "收入": 2036.0, "订单": 63, "到手率": 0.5681, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼合肥包河万达店", "收入": 1769.4, "订单": 63, "到手率": 0.5626, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼常州孟河店", "收入": 1777.5, "订单": 64, "到手率": 0.5702, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼句容1912店", "收入": 1570.8, "订单": 54, "到手率": 0.5725, "负责人": "伍宇星", "城市": "镇江"}, {"店": "同庆楼安庆人民东路店", "收入": 1512.5, "订单": 47, "到手率": 0.5699, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼合肥肥西富茂店", "收入": 1392.1, "订单": 47, "到手率": 0.5902, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼滁州悦达店", "收入": 1432.2, "订单": 52, "到手率": 0.5465, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼合肥徽州府店", "收入": 1374.2, "订单": 52, "到手率": 0.5679, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥之心城店", "收入": 1511.0, "订单": 62, "到手率": 0.5674, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼淮北濉溪店", "收入": 1343.3, "订单": 50, "到手率": 0.5976, "负责人": "陈宝林", "城市": "淮北"}, {"店": "同庆楼滁州富茂店", "收入": 1324.4, "订单": 53, "到手率": 0.5443, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼肥东吾悦店", "收入": 1249.2, "订单": 49, "到手率": 0.568, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼阜阳双清湾店", "收入": 1130.2, "订单": 43, "到手率": 0.5732, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "同庆楼安庆大南门店", "收入": 1091.8, "订单": 44, "到手率": 0.5519, "负责人": "董康", "城市": "安庆"}, {"店": "帕丽斯无锡锡沪路店", "收入": 1024.6, "订单": 43, "到手率": 0.5651, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼阜阳富茂店", "收入": 892.4, "订单": 25, "到手率": 0.6758, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "同庆楼上海富茂店", "收入": 853.7, "订单": 29, "到手率": 0.5463, "负责人": "陈宝林", "城市": "上海"}, {"店": "帕丽斯常州常青里店", "收入": 0.0, "订单": 0, "到手率": 0, "负责人": "伍宇星", "城市": "常州"}, {"店": "帕丽斯合肥奥莱店", "收入": 0.0, "订单": 0, "到手率": 0, "负责人": "陈宝林", "城市": "合肥"}], "reviews": [{"店": "同庆楼合肥滨湖富茂店", "评价数": 40, "差评数": 15, "差评率": 0.0072, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼芜湖华强店", "评价数": 103, "差评数": 11, "差评率": 0.0044, "回复率": 1.0, "负责人": "董康", "城市": "芜湖", "有效订单数": 0}, {"店": "同庆楼常州孟河店", "评价数": 34, "差评数": 8, "差评率": 0.0041, "回复率": 1.0, "负责人": "伍宇星", "城市": "常州", "有效订单数": 0}, {"店": "同庆楼合肥港汇店", "评价数": 70, "差评数": 16, "差评率": 0.004, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼南京尧佳路店", "评价数": 88, "差评数": 18, "差评率": 0.0039, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼无锡江溪路店", "评价数": 52, "差评数": 12, "差评率": 0.0035, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼芜湖银湖店", "评价数": 32, "差评数": 7, "差评率": 0.0034, "回复率": 1.0, "负责人": "董康", "城市": "芜湖", "有效订单数": 0}, {"店": "同庆楼合肥铜陵路店", "评价数": 60, "差评数": 9, "差评率": 0.0033, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥包河万达店", "评价数": 69, "差评数": 7, "差评率": 0.0031, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥百大心悦城店", "评价数": 135, "差评数": 14, "差评率": 0.0031, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼无锡华夏路店", "评价数": 87, "差评数": 13, "差评率": 0.0031, "回复率": 1.0, "负责人": "陈宝林", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼合肥天鹅万达店", "评价数": 65, "差评数": 8, "差评率": 0.0029, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼安庆富茂店", "评价数": 99, "差评数": 12, "差评率": 0.0029, "回复率": 1.0, "负责人": "董康", "城市": "安庆", "有效订单数": 0}, {"店": "同庆楼南京红山路店", "评价数": 51, "差评数": 9, "差评率": 0.0029, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼无锡哥伦布店", "评价数": 48, "差评数": 7, "差评率": 0.0029, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼合肥安高店", "评价数": 76, "差评数": 6, "差评率": 0.0027, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼常州奥体店", "评价数": 51, "差评数": 10, "差评率": 0.0027, "回复率": 1.0, "负责人": "伍宇星", "城市": "常州", "有效订单数": 0}, {"店": "同庆楼合肥庐州府店", "评价数": 75, "差评数": 13, "差评率": 0.0026, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼肥东吾悦店", "评价数": 25, "差评数": 2, "差评率": 0.0026, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼北京金宝街店", "评价数": 59, "差评数": 8, "差评率": 0.0025, "回复率": 1.0, "负责人": "董康", "城市": "北京", "有效订单数": 0}, {"店": "同庆楼阜阳富茂店", "评价数": 11, "差评数": 2, "差评率": 0.0025, "回复率": 1.0, "负责人": "陈宝林", "城市": "阜阳", "有效订单数": 0}, {"店": "同庆楼合肥之心城店", "评价数": 32, "差评数": 4, "差评率": 0.0024, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥凤阳路店", "评价数": 83, "差评数": 11, "差评率": 0.0023, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼无锡宝能店", "评价数": 51, "差评数": 6, "差评率": 0.0023, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼合肥肥西富茂店", "评价数": 15, "差评数": 3, "差评率": 0.0023, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼阜阳双清湾店", "评价数": 24, "差评数": 3, "差评率": 0.0023, "回复率": 1.0, "负责人": "陈宝林", "城市": "阜阳", "有效订单数": 0}, {"店": "同庆楼合肥皖通店", "评价数": 59, "差评数": 8, "差评率": 0.0022, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼安庆人民东路店", "评价数": 34, "差评数": 6, "差评率": 0.0022, "回复率": 1.0, "负责人": "董康", "城市": "安庆", "有效订单数": 0}, {"店": "同庆楼芜湖赭山西路店", "评价数": 71, "差评数": 8, "差评率": 0.0021, "回复率": 1.0, "负责人": "董康", "城市": "芜湖", "有效订单数": 0}, {"店": "同庆楼无锡茂业店", "评价数": 151, "差评数": 12, "差评率": 0.0021, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼芜湖奥体店", "评价数": 89, "差评数": 8, "差评率": 0.002, "回复率": 1.0, "负责人": "董康", "城市": "芜湖", "有效订单数": 0}, {"店": "同庆楼南京国泰店", "评价数": 76, "差评数": 9, "差评率": 0.002, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼合肥高新富茂店", "评价数": 68, "差评数": 6, "差评率": 0.002, "回复率": 0.9706, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥徽州府店", "评价数": 26, "差评数": 4, "差评率": 0.0019, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼南京新华大厦店", "评价数": 113, "差评数": 8, "差评率": 0.0018, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼合肥花园店", "评价数": 58, "差评数": 5, "差评率": 0.0017, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥北城富茂店", "评价数": 18, "差评数": 3, "差评率": 0.0017, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥明珠富茂店", "评价数": 54, "差评数": 6, "差评率": 0.0017, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼合肥长丰路店", "评价数": 38, "差评数": 4, "差评率": 0.0017, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼北京大钟寺店", "评价数": 59, "差评数": 6, "差评率": 0.0016, "回复率": 1.0, "负责人": "董康", "城市": "北京", "有效订单数": 0}, {"店": "同庆楼合肥铜冠富茂店", "评价数": 133, "差评数": 6, "差评率": 0.0015, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼无锡惠山万达店", "评价数": 119, "差评数": 7, "差评率": 0.0014, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼安庆大南门店", "评价数": 23, "差评数": 2, "差评率": 0.0013, "回复率": 1.0, "负责人": "董康", "城市": "安庆", "有效订单数": 0}, {"店": "同庆楼滁州富茂店", "评价数": 23, "差评数": 2, "差评率": 0.0013, "回复率": 1.0, "负责人": "董康", "城市": "滁州", "有效订单数": 0}, {"店": "同庆楼常州吾悦店", "评价数": 48, "差评数": 7, "差评率": 0.0013, "回复率": 1.0, "负责人": "伍宇星", "城市": "常州", "有效订单数": 0}, {"店": "同庆楼无锡安镇店", "评价数": 96, "差评数": 7, "差评率": 0.0013, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼无锡滨湖万达店", "评价数": 47, "差评数": 5, "差评率": 0.0013, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼淮北濉溪店", "评价数": 6, "差评数": 1, "差评率": 0.0013, "回复率": 1.0, "负责人": "陈宝林", "城市": "淮北", "有效订单数": 0}, {"店": "同庆楼合肥马鞍山路店", "评价数": 46, "差评数": 4, "差评率": 0.0012, "回复率": 1.0, "负责人": "董康", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼滁州悦达店", "评价数": 35, "差评数": 2, "差评率": 0.0012, "回复率": 1.0, "负责人": "董康", "城市": "滁州", "有效订单数": 0}, {"店": "同庆楼句容1912店", "评价数": 9, "差评数": 2, "差评率": 0.0012, "回复率": 1.0, "负责人": "伍宇星", "城市": "镇江", "有效订单数": 0}, {"店": "同庆楼南京珠江路店", "评价数": 44, "差评数": 5, "差评率": 0.0011, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼合肥瑶海富茂店", "评价数": 60, "差评数": 4, "差评率": 0.0011, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼上海富茂店", "评价数": 13, "差评数": 1, "差评率": 0.0011, "回复率": 1.0, "负责人": "陈宝林", "城市": "上海", "有效订单数": 0}, {"店": "同庆楼合肥金屯店", "评价数": 87, "差评数": 6, "差评率": 0.001, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}, {"店": "同庆楼溧阳天目路店", "评价数": 80, "差评数": 4, "差评率": 0.0009, "回复率": 1.0, "负责人": "伍宇星", "城市": "溧阳", "有效订单数": 0}, {"店": "帕丽斯无锡锡沪路店", "评价数": 36, "差评数": 1, "差评率": 0.0009, "回复率": 1.0, "负责人": "伍宇星", "城市": "无锡", "有效订单数": 0}, {"店": "同庆楼南京建邺万达店", "评价数": 121, "差评数": 5, "差评率": 0.0008, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "同庆楼南京鼓楼店", "评价数": 90, "差评数": 5, "差评率": 0.0008, "回复率": 1.0, "负责人": "伍宇星", "城市": "南京", "有效订单数": 0}, {"店": "帕丽斯常州常青里店", "评价数": 9, "差评数": 0, "差评率": 0.0, "回复率": 1.0, "负责人": "伍宇星", "城市": "常州", "有效订单数": 0}, {"店": "帕丽斯合肥奥莱店", "评价数": 2, "差评数": 0, "差评率": 0.0, "回复率": 1.0, "负责人": "陈宝林", "城市": "合肥", "有效订单数": 0}], "quality": [{"店": "同庆楼无锡江溪路店", "商品质量分": 4.0, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼常州孟河店", "商品质量分": 4.1, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼南京国泰店", "商品质量分": 4.11, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼句容1912店", "商品质量分": 4.17, "负责人": "伍宇星", "城市": "镇江"}, {"店": "同庆楼合肥包河万达店", "商品质量分": 4.21, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼安庆人民东路店", "商品质量分": 4.21, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼合肥皖通店", "商品质量分": 4.24, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼芜湖赭山西路店", "商品质量分": 4.24, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼芜湖奥体店", "商品质量分": 4.26, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼合肥肥西富茂店", "商品质量分": 4.29, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥花园店", "商品质量分": 4.29, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼无锡宝能店", "商品质量分": 4.29, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥滨湖富茂店", "商品质量分": 4.3, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥长丰路店", "商品质量分": 4.3, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡哥伦布店", "商品质量分": 4.3, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼北京大钟寺店", "商品质量分": 4.33, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼南京红山路店", "商品质量分": 4.33, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥金屯店", "商品质量分": 4.34, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡安镇店", "商品质量分": 4.34, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼芜湖银湖店", "商品质量分": 4.34, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼合肥安高店", "商品质量分": 4.36, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥徽州府店", "商品质量分": 4.37, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼滁州富茂店", "商品质量分": 4.37, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼合肥港汇店", "商品质量分": 4.39, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥庐州府店", "商品质量分": 4.4, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼无锡华夏路店", "商品质量分": 4.4, "负责人": "陈宝林", "城市": "无锡"}, {"店": "同庆楼无锡惠山万达店", "商品质量分": 4.4, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼阜阳双清湾店", "商品质量分": 4.4, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "同庆楼南京尧佳路店", "商品质量分": 4.41, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥凤阳路店", "商品质量分": 4.41, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥马鞍山路店", "商品质量分": 4.41, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼安庆富茂店", "商品质量分": 4.41, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼常州吾悦店", "商品质量分": 4.41, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼阜阳富茂店", "商品质量分": 4.41, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "同庆楼合肥之心城店", "商品质量分": 4.43, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼南京珠江路店", "商品质量分": 4.46, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥铜陵路店", "商品质量分": 4.46, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥百大心悦城店", "商品质量分": 4.47, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼淮北濉溪店", "商品质量分": 4.47, "负责人": "陈宝林", "城市": "淮北"}, {"店": "同庆楼北京金宝街店", "商品质量分": 4.49, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼南京鼓楼店", "商品质量分": 4.5, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥明珠富茂店", "商品质量分": 4.5, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥铜冠富茂店", "商品质量分": 4.5, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼常州奥体店", "商品质量分": 4.5, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼无锡滨湖万达店", "商品质量分": 4.5, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼芜湖华强店", "商品质量分": 4.5, "负责人": "董康", "城市": "芜湖"}, {"店": "帕丽斯合肥奥莱店", "商品质量分": 4.5, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥瑶海富茂店", "商品质量分": 4.51, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼安庆大南门店", "商品质量分": 4.51, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼滁州悦达店", "商品质量分": 4.54, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼南京新华大厦店", "商品质量分": 4.56, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼上海富茂店", "商品质量分": 4.57, "负责人": "陈宝林", "城市": "上海"}, {"店": "同庆楼无锡茂业店", "商品质量分": 4.59, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥高新富茂店", "商品质量分": 4.6, "负责人": "陈宝林", "城市": "合肥"}, {"店": "帕丽斯常州常青里店", "商品质量分": 4.6, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼南京建邺万达店", "商品质量分": 4.69, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥北城富茂店", "商品质量分": 4.69, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥天鹅万达店", "商品质量分": 4.7, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼溧阳天目路店", "商品质量分": 4.7, "负责人": "伍宇星", "城市": "溧阳"}, {"店": "帕丽斯无锡锡沪路店", "商品质量分": 4.8, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼肥东吾悦店", "商品质量分": 4.9, "负责人": "陈宝林", "城市": "合肥"}], "foodsafe": [{"店": "同庆楼常州孟河店", "食品安全负反馈率": 44.03, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼合肥皖通店", "食品安全负反馈率": 31.28, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼南京国泰店", "食品安全负反馈率": 25.36, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥包河万达店", "食品安全负反馈率": 23.06, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼无锡江溪路店", "食品安全负反馈率": 20.26, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼芜湖奥体店", "食品安全负反馈率": 17.73, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼阜阳富茂店", "食品安全负反馈率": 17.56, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "同庆楼无锡安镇店", "食品安全负反馈率": 17.29, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥金屯店", "食品安全负反馈率": 17.16, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼安庆人民东路店", "食品安全负反馈率": 16.42, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼合肥安高店", "食品安全负反馈率": 16.36, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥长丰路店", "食品安全负反馈率": 16.19, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥肥西富茂店", "食品安全负反馈率": 15.6, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼芜湖赭山西路店", "食品安全负反馈率": 15.44, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼芜湖银湖店", "食品安全负反馈率": 14.86, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼无锡惠山万达店", "食品安全负反馈率": 13.63, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼南京红山路店", "食品安全负反馈率": 13.1, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥花园店", "食品安全负反馈率": 12.6, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥凤阳路店", "食品安全负反馈率": 12.46, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼滁州富茂店", "食品安全负反馈率": 12.28, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼无锡宝能店", "食品安全负反馈率": 11.95, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥徽州府店", "食品安全负反馈率": 11.91, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥港汇店", "食品安全负反馈率": 11.85, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼北京大钟寺店", "食品安全负反馈率": 11.76, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼南京尧佳路店", "食品安全负反馈率": 11.58, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼合肥瑶海富茂店", "食品安全负反馈率": 11.37, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥百大心悦城店", "食品安全负反馈率": 10.48, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥马鞍山路店", "食品安全负反馈率": 10.37, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼安庆富茂店", "食品安全负反馈率": 10.18, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼合肥明珠富茂店", "食品安全负反馈率": 10.0, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡华夏路店", "食品安全负反馈率": 9.37, "负责人": "陈宝林", "城市": "无锡"}, {"店": "同庆楼南京鼓楼店", "食品安全负反馈率": 9.25, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼无锡哥伦布店", "食品安全负反馈率": 8.13, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥铜陵路店", "食品安全负反馈率": 8.03, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥滨湖富茂店", "食品安全负反馈率": 7.71, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥高新富茂店", "食品安全负反馈率": 7.5, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥庐州府店", "食品安全负反馈率": 7.43, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼合肥之心城店", "食品安全负反馈率": 7.33, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼芜湖华强店", "食品安全负反馈率": 6.31, "负责人": "董康", "城市": "芜湖"}, {"店": "同庆楼无锡滨湖万达店", "食品安全负反馈率": 4.51, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼合肥铜冠富茂店", "食品安全负反馈率": 3.58, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼无锡茂业店", "食品安全负反馈率": 3.44, "负责人": "伍宇星", "城市": "无锡"}, {"店": "同庆楼南京建邺万达店", "食品安全负反馈率": 3.3, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼常州奥体店", "食品安全负反馈率": 3.01, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼南京珠江路店", "食品安全负反馈率": 1.95, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼常州吾悦店", "食品安全负反馈率": 1.01, "负责人": "伍宇星", "城市": "常州"}, {"店": "同庆楼上海富茂店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "上海"}, {"店": "同庆楼北京金宝街店", "食品安全负反馈率": 0.0, "负责人": "董康", "城市": "北京"}, {"店": "同庆楼南京新华大厦店", "食品安全负反馈率": 0.0, "负责人": "伍宇星", "城市": "南京"}, {"店": "同庆楼句容1912店", "食品安全负反馈率": 0.0, "负责人": "伍宇星", "城市": "镇江"}, {"店": "同庆楼合肥北城富茂店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼合肥天鹅万达店", "食品安全负反馈率": 0.0, "负责人": "董康", "城市": "合肥"}, {"店": "同庆楼安庆大南门店", "食品安全负反馈率": 0.0, "负责人": "董康", "城市": "安庆"}, {"店": "同庆楼淮北濉溪店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "淮北"}, {"店": "同庆楼溧阳天目路店", "食品安全负反馈率": 0.0, "负责人": "伍宇星", "城市": "溧阳"}, {"店": "同庆楼滁州悦达店", "食品安全负反馈率": 0.0, "负责人": "董康", "城市": "滁州"}, {"店": "同庆楼肥东吾悦店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "合肥"}, {"店": "同庆楼阜阳双清湾店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "阜阳"}, {"店": "帕丽斯合肥奥莱店", "食品安全负反馈率": 0.0, "负责人": "陈宝林", "城市": "合肥"}, {"店": "帕丽斯常州常青里店", "食品安全负反馈率": 0.0, "负责人": "伍宇星", "城市": "常州"}, {"店": "帕丽斯无锡锡沪路店", "食品安全负反馈率": 0.0, "负责人": "伍宇星", "城市": "无锡"}], "reviewMeta": {"差评总数": 403, "有效订单总数": 190157, "周期": "近30天", "口径": "差评率=差评数÷有效订单总数；美团差评=商品评分<3；淘闪差评=总体评分<3"}, "qualityMeta": {"周期": "本月(10-01~10-08)", "均值": 4.43}, "foodMeta": {"周期": "本月(10-01~10-08)", "均值": 9.53}, "badAnalysis": {"cats": [{"type": "其他", "count": 75}, {"type": "口味难吃", "count": 36}, {"type": "腥味异味", "count": 19}, {"type": "口感差", "count": 14}, {"type": "菜凉了", "count": 12}, {"type": "口味其他", "count": 11}, {"type": "菜品不符", "count": 10}, {"type": "价格贵", "count": 9}, {"type": "包装差", "count": 9}, {"type": "分量少", "count": 6}, {"type": "服务差", "count": 5}, {"type": "配送慢", "count": 3}, {"type": "缺菜", "count": 3}, {"type": "没味道", "count": 2}, {"type": "辣度问题", "count": 1}, {"type": "口味太咸", "count": 1}], "details": []}};
-var charts = {};
-function shortName(s){ return s.replace("同庆楼",""); }
-function pct(x,d){ return (x*100).toFixed(d===undefined?2:d)+"%"; }
-function initChart(id){
-  if(typeof echarts === "undefined"){
-    return { setOption: function(){}, dispose: function(){} };
-  }
-  if(charts[id]) charts[id].dispose();
-  try {
-    charts[id] = echarts.init(document.getElementById(id));
-  } catch(e) {
-    charts[id] = { setOption: function(){}, dispose: function(){} };
-  }
-  return charts[id];
-}
-function barColor(v, bad, warn){
-  return v >= bad ? "#f5222d" : v >= warn ? "#faad14" : "#52c41a";
-}
-function fmtInt(x){
-  if(x===null||x===undefined||x===""||isNaN(Number(x))) return "-";
-  return String(Math.round(Number(x)));
-}
-function gradeBadge(g){
-  return '<span class="grade grade-'+g+'">'+g+'类</span>';
-}
-/* 评级函数 */
-function gradeReview(r){ return r < 0.005 ? "A" : r < 0.01 ? "B" : "C"; }
-function gradeQuality(v){ return v >= 4.5 ? "A" : v >= 4.3 ? "B" : "C"; }
-function gradeFood(v){ return v <= 10 ? "A" : v <= 15 ? "B" : "C"; }
-function gradeStore(v){ return v >= 0.6 ? "A" : v >= 0.55 ? "B" : "C"; }
-
-function applyFilter(){
-  var city = document.getElementById("cityFilter").value;
-  var f = function(r){ return (!city || r.城市 === city); };
-
-  /* KPI */
-  var stores = DATA.stores.filter(f);
-  var income = stores.reduce(function(a,s){return a+s.收入;},0);
-  var orders = stores.reduce(function(a,s){return a+s.订单;},0);
-  var rs0 = DATA.reviews.filter(f);
-  var bad0 = rs0.reduce(function(a,r){return a+r.差评数;},0);
-  var diffRate = (function(){
-    var ratio = rs0.reduce(function(a,r){return a+r.评价数;},0)/DATA.reviews.reduce(function(a,r){return a+r.评价数;},0);
-    var t = Math.round(DATA.reviewMeta.有效订单总数*ratio);
-    return t ? bad0/t : 0;
-  })();
-  var qAvg = (function(){var q=DATA.quality.filter(f);return q.length?q.reduce(function(a,r){return a+r.商品质量分;},0)/q.length:0;})();
-  var fAvg = (function(){var q=DATA.foodsafe.filter(f);return q.length?q.reduce(function(a,r){return a+r.食品安全负反馈率;},0)/q.length:0;})();
-
-  document.getElementById("kpis").innerHTML = [
-    ["📅","本月实收","¥1681211","10-01~10-08 · 三平台"],
-    ["📊","本月订单","48788单","10-01~10-08 · 三平台"],
-    ["💰","昨日实收","¥"+Math.round(income),"美团+淘闪+京东"],
-    ["📦","昨日订单",fmtInt(orders)+"单","美团+淘闪+京东"],
-    ["💵","昨日到手率","57.89%","美团+淘闪+京东 · 10-08"],
-    ["🏷️","昨日折扣率","25.81%","美团+淘闪+京东 · 10-08"],
-    ["⭐","差评率",pct(diffRate),"美团+淘闪 · 10-01~10-08"],
-    ["🍽️","菜品质量",qAvg.toFixed(2)+"分","美团 · 10-01~10-08"],
-    ["🛡️","食安负反馈",fAvg.toFixed(1)+"%","美团 · 10-01~10-08"]
-  ].map(function(k){
-    return '<div class="kpi"><div class="icon">'+k[0]+'</div><div class="label">'+k[1]+'</div><div class="val">'+k[2]+'</div><div class="hint">'+k[3]+'</div></div>';
-  }).join("");
-
-  /* 目标 */
-  var targets = [
-    {name:"董康", goal:2973819, actual:623937, rate:0.813},
-    {name:"伍宇星", goal:3699180, actual:735924, rate:0.771},
-    {name:"陈宝林", goal:2143107, actual:321350, rate:0.581}
-  ];
-  document.getElementById("targetBars").innerHTML = targets.map(function(t){
-    var c = t.rate>=0.9?"#52c41a":t.rate>=0.7?"#faad14":"#f5222d";
-    return '<div class="target"><div class="t-head"><span class="t-name">'+t.name+'</span><span>预估完成 <b style="color:'+c+'">'+pct(t.rate,1)+'</b></span></div>'
-      +'<div class="bar"><div style="width:'+Math.min(t.rate*100,100)+'%;background:'+c+'"></div></div>'
-      +'<div class="t-foot">月目标 ¥'+t.goal+' ｜ 已完成 ¥'+t.actual+'</div></div>';
-  }).join("");
-
-  /* 差评率：从好到差（升序） */
-  var rs = rs0.slice().sort(function(a,b){return a.差评率-b.差评率;});
-  var c1 = initChart("chartReview");
-  var top10 = rs.slice().sort(function(a,b){return b.差评率-a.差评率;}).slice(0,10);
-  c1.setOption({
-    tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>差评率 "+p[0].value+"%";}},
-    xAxis:{type:"category",data:top10.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
-    yAxis:{type:"value",axisLabel:{formatter:"{value}%"}},
-    series:[{type:"bar",data:top10.map(function(r){return +(r.差评率*100).toFixed(2);}),
-      itemStyle:{color:function(p){return barColor(p.value,1,0.5);}},
-      label:{show:true,position:"top",formatter:"{c}%",fontSize:10}}],
-    grid:{left:40,right:20,top:20,bottom:70}
-  });
-  document.getElementById("reviewTable").innerHTML = rs.map(function(r){
-    var dot = r.差评率>=0.01?"dot-r":r.差评率>=0.005?"dot-y":"dot-g";
-    return "<tr><td><span class='dot "+dot+"'></span>"+shortName(r.店)+"</td><td>"+fmtInt(r.有效订单数)+"</td><td>"+fmtInt(r.差评数)+"</td><td><b>"+pct(r.差评率)+"</b></td><td>"+Math.round(r.回复率*100)+"%</td><td>"+gradeBadge(gradeReview(r.差评率))+"</td></tr>";
-  }).join("");
-
-  /* 质量分：从好到差（降序） */
-  var qs = DATA.quality.filter(f).slice().sort(function(a,b){return b.商品质量分-a.商品质量分;});
-  document.getElementById("qualitySummary").textContent = "共"+qs.length+"家 ｜ 平均 "+(qs.reduce(function(a,r){return a+r.商品质量分;},0)/qs.length).toFixed(2)+" 分";
-  var c2 = initChart("chartQuality");
-  var qBot = qs.slice().sort(function(a,b){return a.商品质量分-b.商品质量分;}).slice(0,12);
-  c2.setOption({
-    tooltip:{trigger:"axis"},
-    xAxis:{type:"category",data:qBot.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
-    yAxis:{type:"value",min:3.5,max:5},
-    series:[{type:"bar",data:qBot.map(function(r){return r.商品质量分;}),
-      itemStyle:{color:function(p){return p.value<4.3?"#f5222d":p.value<4.5?"#faad14":"#52c41a";}},
-      label:{show:true,position:"top",fontSize:9}}],
-    grid:{left:40,right:20,top:20,bottom:70}
-  });
-  document.getElementById("qualityTable").innerHTML = qs.map(function(r){
-    var dot = r.商品质量分<4.3?"dot-r":r.商品质量分<4.5?"dot-y":"dot-g";
-    return "<tr><td><span class='dot "+dot+"'></span>"+shortName(r.店)+"</td><td><b>"+r.商品质量分.toFixed(2)+"</b></td><td>"+gradeBadge(gradeQuality(r.商品质量分))+"</td></tr>";
-  }).join("");
-
-  /* 食安：从好到差（升序） */
-  var fs = DATA.foodsafe.filter(f).slice().sort(function(a,b){return a.食品安全负反馈率-b.食品安全负反馈率;});
-  document.getElementById("foodSummary").textContent = "共"+fs.length+"家 ｜ 平均 "+(fs.reduce(function(a,r){return a+r.食品安全负反馈率;},0)/fs.length).toFixed(1)+"%";
-  var c3 = initChart("chartFood");
-  var fTop = fs.slice().sort(function(a,b){return b.食品安全负反馈率-a.食品安全负反馈率;}).slice(0,12);
-  c3.setOption({
-    tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>"+p[0].value+"%";}},
-    xAxis:{type:"category",data:fTop.map(function(r){return shortName(r.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
-    yAxis:{type:"value",axisLabel:{formatter:"{value}%"}},
-    series:[{type:"bar",data:fTop.map(function(r){return +r.食品安全负反馈率.toFixed(1);}),
-      itemStyle:{color:function(p){return barColor(p.value,15,10);}},
-      label:{show:true,position:"top",formatter:"{c}%",fontSize:9}}],
-    grid:{left:40,right:20,top:20,bottom:70}
-  });
-  document.getElementById("foodTable").innerHTML = fs.map(function(r){
-    var dot = r.食品安全负反馈率>15?"dot-r":r.食品安全负反馈率>10?"dot-y":"dot-g";
-    return "<tr><td><span class='dot "+dot+"'></span>"+shortName(r.店)+"</td><td><b>"+r.食品安全负反馈率.toFixed(1)+"%</b></td><td>"+gradeBadge(gradeFood(r.食品安全负反馈率))+"</td></tr>";
-  }).join("");
-
-  /* 门店排行：从好到差（实收降序） */
-  var ss = stores.slice().sort(function(a,b){return b.收入-a.收入;});
-  var c4 = initChart("chartStore");
-  var top12 = ss.slice(0,12);
-  c4.setOption({
-    tooltip:{trigger:"axis",formatter:function(p){return p[0].name+"<br/>¥"+Number(p[0].value);}},
-    xAxis:{type:"category",data:top12.map(function(s){return shortName(s.店);}),axisLabel:{rotate:30,fontSize:10,interval:0}},
-    yAxis:{type:"value",axisLabel:{formatter:function(v){return v>=1000?(v/1000)+"k":v;}}},
-    series:[{type:"bar",data:top12.map(function(s){return Math.round(s.收入);}),
-      itemStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"#ff7875"},{offset:1,color:"#c0392b"}]}},
-      label:{show:true,position:"top",fontSize:9,formatter:function(p){return (p.value/1000).toFixed(1)+"k";}}}],
-    grid:{left:45,right:20,top:20,bottom:70}
-  });
-  document.getElementById("storeTable").innerHTML = ss.map(function(s,i){
-    var rc = i<3?"rank-"+(i+1):"";
-    return "<tr><td><span class='rank "+rc+"'>"+(i+1)+"</span></td><td>"+shortName(s.店)+"</td><td><b>¥"+Math.round(s.收入)+"</b></td><td>"+fmtInt(s.订单)+"</td><td>"+(s.到手率*100).toFixed(1)+"%</td><td>"+gradeBadge(gradeStore(s.到手率))+"</td></tr>";
-  }).join("");
-}
-
-/* 差评分析：按门店展开 */
-  var bc = DATA.badAnalysis.cats;
-  if(typeof echarts !== "undefined"){
-    try { charts.badCat = echarts.init(document.getElementById("chartBadCat")); }
-    catch(e) { charts.badCat = { setOption: function(){} }; }
-  } else {
-    charts.badCat = { setOption: function(){} };
-  }
-  charts.badCat.setOption({
-    title:{text:"差评问题类型分布",left:"center",textStyle:{fontSize:13}},
-    tooltip:{trigger:"axis",axisPointer:{type:"shadow"}},
-    xAxis:{type:"value"},
-    yAxis:{type:"category",data:bc.map(function(x){return x.type;}).reverse(),axisLabel:{fontSize:11}},
-    series:[{type:"bar",data:bc.map(function(x){return x.count;}).reverse(),
-      itemStyle:{color:"#f5222d"},label:{show:true,position:"right"}}]
-  });
-  var bd = DATA.badAnalysis.details.filter(f);
-  document.getElementById("badStoreList").innerHTML = bd.map(function(x){
-    var probs = x.problems.map(function(p){
-      var exs = p.examples.map(function(e){return "<div style='color:#666;font-size:12px;margin:2px 0'>&ldquo;"+e+"&rdquo;</div>";}).join("");
-      return "<div style='margin:8px 0'><b style='color:#c53030'>"+p.type+" ×"+p.count+"</b>"+exs+"</div>";
-    }).join("");
-    return "<details style='border:1px solid #eee;border-radius:6px;margin:6px 0;padding:8px 12px'>"
-      +"<summary style='cursor:pointer;font-weight:600'>"+shortName(x.店)
-      +" <span style='color:#c53030'>"+x.差评数+"条差评</span></summary>"
-      +"<div style='margin-top:8px'>"+probs+"</div></details>";
-  }).join("") || "<div style='text-align:center;color:#999'>本月暂无差评</div>";
-
-window.addEventListener("resize", function(){ for(var k in charts){ try{ if(charts[k].resize) charts[k].resize(); }catch(e){} } });
-applyFilter();
-</script>
-</div></body></html>
+</body>
+</html>
